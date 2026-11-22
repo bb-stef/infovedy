@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { SITE, url } from '../lib/site';
+import MotivPrepinac from '../components/MotivPrepinac.astro';
 
 interface Props {
   title?: string;
@@ -27,6 +28,14 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{pageTitle}</title>
+    <script is:inline>
+      // Nastaví uložený motiv ještě před vykreslením (viz MotivPrepinac.astro).
+      document.documentElement.classList.add('js');
+      try {
+        var m = localStorage.getItem('infovedy-motiv');
+        if (m === 'svetly' || m === 'tmavy') document.documentElement.dataset.motiv = m;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
@@ -36,19 +45,22 @@ const nav = [
           {SITE.nazev}
           <span class="brand__kod">{SITE.predmetKod}</span>
         </a>
-        <nav aria-label="Hlavní navigace">
-          <ul class="site-nav">
-            {
-              nav.map((item) => (
-                <li>
-                  <a href={item.href} aria-current={item.match(path) ? 'page' : undefined}>
-                    {item.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
+        <div class="site-header__nastroje">
+          <nav aria-label="Hlavní navigace">
+            <ul class="site-nav">
+              {
+                nav.map((item) => (
+                  <li>
+                    <a href={item.href} aria-current={item.match(path) ? 'page' : undefined}>
+                      {item.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+          <MotivPrepinac />
+        </div>
       </div>
     </header>
     <main id="obsah" tabindex="-1"><slot /></main>

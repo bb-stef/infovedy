@@ -1,0 +1,82 @@
+---
+/**
+ * Přepínač barevného motivu: Podle systému / Světlý / Tmavý.
+ * Volba se ukládá do localStorage (klíč „infovedy-motiv“); „Podle systému“ ji maže.
+ * Počáteční motiv nastavuje inline skript v <head> (BaseLayout), aby stránka neblikla.
+ * Bez JavaScriptu je přepínač skrytý a web se řídí systémem.
+ */
+const volby = [
+  { hodnota: 'system', popis: 'Podle systému' },
+  { hodnota: 'svetly', popis: 'Světlý' },
+  { hodnota: 'tmavy', popis: 'Tmavý' },
+] as const;
+---
+
+<div class="motiv" role="group" aria-label="Barevný motiv">
+  {
+    volby.map((v) => (
+      <button type="button" class="motiv__volba" data-motiv-volba={v.hodnota} aria-pressed="false" aria-label={v.popis} title={v.popis}>
+        {v.hodnota === 'system' && (
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="1.75" y="2.5" width="12.5" height="8.5" rx="1" />
+            <path d="M5.5 13.75h5M8 11v2.75" />
+          </svg>
+        )}
+        {v.hodnota === 'svetly' && (
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="2.75" />
+            <path d="M8 1.25v1.5M8 13.25v1.5M1.25 8h1.5M13.25 8h1.5M3.2 3.2l1.06 1.06M11.74 11.74l1.06 1.06M3.2 12.8l1.06-1.06M11.74 4.26l1.06-1.06" />
+          </svg>
+        )}
+        {v.hodnota === 'tmavy' && (
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M13.5 9.6A5.75 5.75 0 0 1 6.4 2.5a5.75 5.75 0 1 0 7.1 7.1Z" />
+          </svg>
+        )}
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  const KLIC = 'infovedy-motiv';
+  type Motiv = 'svetly' | 'tmavy';
+  const tlacitka = document.querySelectorAll<HTMLButtonElement>('[data-motiv-volba]');
+
+  function nacti(): Motiv | null {
+    try {
+      const v = localStorage.getItem(KLIC);
+      return v === 'svetly' || v === 'tmavy' ? v : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function zobraz(motiv: Motiv | null) {
+    if (motiv) document.documentElement.dataset.motiv = motiv;
+    else delete document.documentElement.dataset.motiv;
+    const aktivni = motiv ?? 'system';
+    tlacitka.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.motivVolba === aktivni)));
+  }
+
+  tlacitka.forEach((t) =>
+    t.addEventListener('click', () => {
+      const volba = t.dataset.motivVolba;
+      const motiv: Motiv | null = volba === 'svetly' || volba === 'tmavy' ? volba : null;
+      try {
+        if (motiv) localStorage.setItem(KLIC, motiv);
+        else localStorage.removeItem(KLIC);
+      } catch {
+        /* úložiště nedostupné — motiv platí jen pro tuto stránku */
+      }
+      zobraz(motiv);
+    }),
+  );
+
+  // Změna v jiné záložce
+  window.addEventListener('storage', (e) => {
+    if (e.key === KLIC || e.key === null) zobraz(nacti());
+  });
+
+  zobraz(nacti());
+</script>

@@ -36,8 +36,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Tmavý motiv: podle systému (bez uložené volby), nebo zvolený ručně.
+   Hodnoty jsou v obou blocích stejné — při úpravě měňte oba. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-motiv="svetly"]) {
     --bg: #161718;
     --surface: #1e1f21;
     --soft: #26282a;
@@ -55,6 +57,25 @@
     --ok-soft: #1f3027;
     color-scheme: dark;
   }
+}
+
+:root[data-motiv="tmavy"] {
+  --bg: #161718;
+  --surface: #1e1f21;
+  --soft: #26282a;
+  --text: #e6e6e3;
+  --muted: #a9adb1;
+  --faint: #7d8185;
+  --line: #2f3134;
+  --line-strong: #46494d;
+  --accent: #8db6d3;
+  --accent-soft: #23303a;
+  --ok: #7fb894;
+  --wip: #d4b26a;
+  --bad: #e08b82;
+  --bad-soft: #3a2422;
+  --ok-soft: #1f3027;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -102,6 +123,15 @@ h3 { font-size: 1.12rem; margin: 1.75rem 0 0.5rem; }
 .site-nav a { color: var(--muted); text-decoration: none; padding-block: 0.25rem; border-bottom: 2px solid transparent; }
 .site-nav a:hover { color: var(--text); }
 .site-nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--text); }
+.site-header__nastroje { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem; }
+
+/* Přepínač barevného motivu (bez JS skrytý) */
+.motiv { display: none; border: 1px solid var(--line); border-radius: 99px; padding: 2px; gap: 2px; }
+.js .motiv { display: inline-flex; }
+.motiv__volba { display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; padding: 0; border: 0; border-radius: 99px; background: transparent; color: var(--faint); cursor: pointer; }
+.motiv__volba:hover { color: var(--text); }
+.motiv__volba[aria-pressed="true"] { background: var(--soft); color: var(--text); }
+.motiv__volba svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 
 .site-footer { border-top: 1px solid var(--line); margin-top: 4rem; font-size: 0.85rem; color: var(--muted); }
 .site-footer__inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; padding-block: 1.25rem; }
@@ -291,7 +321,12 @@ a.karta:hover { border-color: var(--line-strong); }
 
 /* ---------- Tisk ---------- */
 @media print {
-  :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #333; --faint: #555; }
+  /* :root:root — stejná specificita jako pravidla tmavého motivu, aby je tisk přebil */
+  :root:root, :root[data-motiv] {
+    --bg: #fff; --surface: #fff; --soft: #f1f1ed; --text: #000; --muted: #333; --faint: #555;
+    --line: #e2e2dc; --line-strong: #c4c4bc; --accent: #2f5a78; --ok-soft: #e8f1eb; --bad-soft: #f6e9e7;
+    color-scheme: light;
+  }
   .site-header, .site-footer, .material__aside, .material__toc-mobile, .pager, .akce, .skip-link, .no-print { display: none !important; }
   .material { display: block; padding: 0; }
   body { font-size: 11pt; }
