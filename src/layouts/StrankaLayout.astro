@@ -1,0 +1,34 @@
+---
+/** Jednoduchá stránka mimo učební materiál (workshop, úpravy). */
+import BaseLayout from './BaseLayout.astro';
+import StavBadge from '../components/StavBadge.astro';
+import type { Stav } from '../lib/site';
+
+interface Props {
+  title: string;
+  popis?: string;
+  oznaceni?: string;
+  autori?: string[];
+  stav?: Stav;
+  nadrazena?: { nazev: string; href: string };
+}
+
+const { title, popis, oznaceni, autori = [], stav, nadrazena } = Astro.props;
+---
+
+<BaseLayout title={title} description={popis}>
+  <div class="wrap" style="padding-top: 2.5rem">
+    <header class="page-head">
+      <p class="meta">
+        {nadrazena && <a href={nadrazena.href}>← {nadrazena.nazev}</a>}
+        {oznaceni && <span>{oznaceni}</span>}
+        {autori.length > 0 && <span>autoři: {autori.join(', ')}</span>}
+        {stav && <StavBadge stav={stav} />}
+        <slot name="meta" />
+      </p>
+      <h1>{title}</h1>
+      {popis && <p class="lead">{popis}</p>}
+    </header>
+    <slot />
+  </div>
+</BaseLayout>

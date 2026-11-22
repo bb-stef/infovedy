@@ -1,32 +1,64 @@
 ---
 import '../styles/global.css';
+import { SITE, url } from '../lib/site';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
-const {
-  title = 'Infovedy',
-  description = 'Web Infovedy. Stránku pripravujeme.',
-} = Astro.props;
-const homeUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const { title, description = 'Digitální učební materiál a workshop k tématu big data. ISKM01 Informační vědy, KISK FF MU.' } =
+  Astro.props;
+const pageTitle = title ? `${title} · ${SITE.nazev}` : `${SITE.nazev} · ${SITE.predmetKod}`;
+
+const path = Astro.url.pathname;
+const nav = [
+  { label: 'Materiál', href: url('material/'), match: (p: string) => p.startsWith(url('material/')) && !p.startsWith(url('material/test/')) },
+  { label: 'Workshop', href: url('workshop/'), match: (p: string) => p.startsWith(url('workshop/')) },
+  { label: 'Test', href: url('material/test/'), match: (p: string) => p.startsWith(url('material/test/')) },
+  { label: 'Úpravy', href: url('verze/'), match: (p: string) => p.startsWith(url('verze/')) },
+];
 ---
 
 <!doctype html>
-<html lang="sk">
+<html lang="cs">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <title>{title}</title>
+    <title>{pageTitle}</title>
   </head>
   <body>
-    <a class="skip-link" href="#obsah">Preskočiť na obsah</a>
+    <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
     <header class="site-header">
-      <a class="brand" href={homeUrl}>Infovedy</a>
+      <div class="wrap site-header__inner">
+        <a class="brand" href={url()}>
+          {SITE.nazev}
+          <span class="brand__kod">{SITE.predmetKod}</span>
+        </a>
+        <nav aria-label="Hlavní navigace">
+          <ul class="site-nav">
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={item.match(path) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
     </header>
     <main id="obsah" tabindex="-1"><slot /></main>
-    <footer class="site-footer">Infovedy</footer>
+    <footer class="site-footer">
+      <div class="wrap site-footer__inner">
+        <span>
+          {SITE.predmet} · <a href={SITE.instituceUrl}>{SITE.instituce}</a> · {SITE.semestr}
+        </span>
+        <a href={url('material/autori/')}>Tým projektu</a>
+      </div>
+    </footer>
   </body>
 </html>

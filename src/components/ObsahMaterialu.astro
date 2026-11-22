@@ -1,0 +1,25 @@
+---
+import StavBadge from './StavBadge.astro';
+import type { Kapitola } from '../lib/site';
+
+interface Props {
+  kapitoly: Kapitola[];
+  aktivni: string;
+}
+
+const { kapitoly, aktivni } = Astro.props;
+---
+
+<ol class="toc">
+  {
+    kapitoly.map((k) => (
+      <li>
+        <a href={k.href} aria-current={k.cislo === aktivni ? 'page' : undefined}>
+          <span class="toc__cislo">{k.cislo}</span>
+          <span class="toc__nazev">{k.nazev}</span>
+          <StavBadge stav={k.stav} tecka />
+        </a>
+      </li>
+    ))
+  }
+</ol>

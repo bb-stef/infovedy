@@ -1,0 +1,24 @@
+---
+import { STAV_POPIS, type Stav } from '../lib/site';
+
+interface Props {
+  stav: Stav;
+  /** Jen tečka bez textu (v bočním obsahu). */
+  tecka?: boolean;
+}
+
+const { stav, tecka = false } = Astro.props;
+---
+
+{
+  tecka ? (
+    <span class={`stav-tecka stav-${stav}`} title={`Stav: ${STAV_POPIS[stav]}`}>
+      <span class="sr-only">Stav: {STAV_POPIS[stav]}</span>
+    </span>
+  ) : (
+    <span class={`stav stav-${stav}`}>
+      <span class={`stav-tecka stav-${stav}`} aria-hidden="true" />
+      {STAV_POPIS[stav]}
+    </span>
+  )
+}

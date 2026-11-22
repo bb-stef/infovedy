@@ -1,11 +1,91 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import StavBadge from '../components/StavBadge.astro';
+import { CILE, SITE, getKapitoly, url } from '../lib/site';
+
+const kapitoly = await getKapitoly();
+const sondy = await getCollection('sondy');
+const anotace = await getCollection('anotace');
+const otazky = await getCollection('otazky');
+const hotoveSondy = sondy.filter((s) => s.data.stav !== 'chybi').length;
 ---
 
 <BaseLayout>
-  <section class="intro" aria-labelledby="page-title">
-    <p class="eyebrow">Vitajte</p>
-    <h1 id="page-title">Infovedy</h1>
-    <p class="lead">Stránku pripravujeme.</p>
+  <section class="hero">
+    <div class="wrap hero__inner">
+      <p class="meta">
+        <span>{SITE.predmet}</span><span>{SITE.instituce}</span><span>{SITE.semestr}</span>
+      </p>
+      <h1>{SITE.nazev}</h1>
+      <p class="lead">Digitální učební materiál a workshop k tématu big data.</p>
+    </div>
   </section>
+
+  <div class="wrap">
+    <div class="rozcestnik">
+      <section class="karta karta--hlavni" aria-labelledby="cast-1">
+        <p class="label">Část 1 · hlavní výstup</p>
+        <h2 id="cast-1"><a href={url('material/')}>Učební materiál</a></h2>
+        <p>Teorie, přístupy, sondy do výzkumu a praxe, anotovaná literatura a test.</p>
+        <ol class="karta-toc">
+          {
+            kapitoly.map((k) => (
+              <li>
+                <a href={k.href}>
+                  <span class="toc__cislo">{k.cislo}</span>
+                  <span class="toc__nazev">{k.nazev}</span>
+                  <StavBadge stav={k.stav} tecka />
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <a class="karta" href={url('workshop/')} aria-labelledby="cast-2">
+        <p class="label">Část 2</p>
+        <h2 id="cast-2">Workshop</h2>
+        <p>45minutová edukační jednotka s aktivitami pro práci v hodině.</p>
+        <p class="meta" style="margin-top: 1rem">
+          {SITE.terminyWorkshopu.map((t) => <span>{t}</span>)}
+        </p>
+      </a>
+    </div>
+
+    <div class="statistiky" aria-label="Stav rozpracovanosti">
+      <div class="statistika">
+        <strong>{hotoveSondy}<small> / {CILE.sondy}</small></strong>
+        <span>rozpracovaných sond</span>
+      </div>
+      <div class="statistika">
+        <strong>{anotace.length}<small> / {CILE.anotaceMin}–{CILE.anotaceMax}</small></strong>
+        <span>anotovaných textů</span>
+      </div>
+      <div class="statistika">
+        <strong>{otazky.length}<small> / {CILE.otazky}</small></strong>
+        <span>testových otázek</span>
+      </div>
+      <div class="statistika">
+        <strong>{SITE.tym.length}</strong>
+        <span>členů týmu</span>
+      </div>
+    </div>
+
+    <div class="o-projektu">
+      <section>
+        <h2>O projektu</h2>
+        <p>
+          Týmový výstup předmětu {SITE.predmet} na <a href={SITE.instituceUrl}>{SITE.instituce}</a>. Materiál
+          prochází dvěma koly úprav podle zpětné vazby ostatních skupin a účastníků workshopu – viz
+          <a href={url('verze/')}>úpravy po zpětné vazbě</a>.
+        </p>
+      </section>
+      <section>
+        <h2>Tým</h2>
+        <ul class="tym">{SITE.tym.map((jmeno) => <li>{jmeno}</li>)}</ul>
+        <p style="margin-top: 0.6rem"><a href={url('material/autori/')}>Kdo co dělal</a></p>
+      </section>
+    </div>
+  </div>
 </BaseLayout>

@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import MaterialLayout from '../../../layouts/MaterialLayout.astro';
+import StavBadge from '../../../components/StavBadge.astro';
+import { url } from '../../../lib/site';
+
+const sondy = (await getCollection('sondy')).sort((a, b) => a.data.poradi - b.data.poradi);
+---
+
+<MaterialLayout
+  cislo="03"
+  title="Sondy"
+  popis="Co se v tématu big data zkoumá nebo aplikačně řeší a jak. Každá sonda má stejnou osnovu: co se zkoumá, jak, co z toho plyne a zdroje."
+>
+  <div class="mrizka">
+    {
+      sondy.map((s) => (
+        <a class="karta" href={url(`material/sondy/${s.id}/`)}>
+          <p class="label">Sonda {String(s.data.poradi).padStart(2, '0')}</p>
+          <h2>{s.data.title}</h2>
+          {s.data.perex && <p>{s.data.perex}</p>}
+          <div class="karta__pata">
+            <span class="mono">{s.data.autori.join(', ')}</span>
+            <StavBadge stav={s.data.stav} />
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</MaterialLayout>

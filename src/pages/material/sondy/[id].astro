@@ -1,0 +1,63 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import MaterialLayout from '../../../layouts/MaterialLayout.astro';
+import { url } from '../../../lib/site';
+
+export const getStaticPaths = (async () => {
+  const sondy = (await getCollection('sondy')).sort((a, b) => a.data.poradi - b.data.poradi);
+  return sondy.map((sonda, i) => ({
+    params: { id: sonda.id },
+    props: { sonda, predchozi: sondy[i - 1], dalsi: sondy[i + 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  sonda: CollectionEntry<'sondy'>;
+  predchozi?: CollectionEntry<'sondy'>;
+  dalsi?: CollectionEntry<'sondy'>;
+}
+
+const { sonda, predchozi, dalsi } = Astro.props;
+const { Content } = await render(sonda);
+---
+
+<MaterialLayout
+  cislo="03"
+  title={sonda.data.title}
+  popis={sonda.data.perex}
+  autori={sonda.data.autori}
+  stav={sonda.data.stav}
+  nadrazena={{ nazev: 'Sondy', href: url('material/sondy/') }}
+>
+  <div class="prose"><Content /></div>
+
+  <nav class="pager" aria-label="Další sondy">
+    {
+      predchozi ? (
+        <a href={url(`material/sondy/${predchozi.id}/`)} rel="prev">
+          <span class="label">← Předchozí sonda</span>
+          {predchozi.data.title}
+        </a>
+      ) : (
+        <a href={url('material/sondy/')}>
+          <span class="label">← Zpět</span>
+          Přehled sond
+        </a>
+      )
+    }
+    {
+      dalsi ? (
+        <a href={url(`material/sondy/${dalsi.id}/`)} rel="next" class="pager__next">
+          <span class="label">Další sonda →</span>
+          {dalsi.data.title}
+        </a>
+      ) : (
+        <a href={url('material/literatura/')} rel="next" class="pager__next">
+          <span class="label">Další →</span>
+          04 Anotovaná literatura
+        </a>
+      )
+    }
+  </nav>
+</MaterialLayout>

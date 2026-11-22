@@ -1,0 +1,30 @@
+---
+/**
+ * Vykreslí textovou kapitolu materiálu z kolekce `stranky`.
+ */
+import { getEntry, render } from 'astro:content';
+import MaterialLayout from '../layouts/MaterialLayout.astro';
+
+interface Props {
+  id: string;
+  cislo: string;
+}
+
+const { id, cislo } = Astro.props;
+const entry = await getEntry('stranky', id);
+if (!entry) throw new Error(`Chybí soubor src/content/stranky/${id}.md`);
+const { Content } = await render(entry);
+---
+
+<MaterialLayout
+  cislo={cislo}
+  title={entry.data.title}
+  popis={entry.data.popis}
+  autori={entry.data.autori}
+  stav={entry.data.stav}
+  aktualizovano={entry.data.aktualizovano}
+>
+  <slot name="pred" />
+  <div class="prose"><Content /></div>
+  <slot />
+</MaterialLayout>

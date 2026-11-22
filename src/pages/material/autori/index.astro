@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+import StrankaMaterialu from '../../../components/StrankaMaterialu.astro';
+import { SITE, url } from '../../../lib/site';
+
+/** Automatický přehled: kdo je uveden jako autor kterých textů. */
+const [stranky, sondy, anotace, hadanky] = await Promise.all([
+  getCollection('stranky'),
+  getCollection('sondy'),
+  getCollection('anotace'),
+  getCollection('hadanky'),
+]);
+
+const odkazStranky: Record<string, string> = {
+  uvod: 'material/',
+  pristupy: 'material/pristupy/',
+  literatura: 'material/literatura/',
+  autori: 'material/autori/',
+  workshop: 'workshop/',
+  verze: 'verze/',
+};
+
+const texty = [
+  ...stranky.map((s) => ({ nazev: s.data.title, href: url(odkazStranky[s.id] ?? ''), autori: s.data.autori })),
+  ...sondy.map((s) => ({ nazev: `Sonda: ${s.data.title}`, href: url(`material/sondy/${s.id}/`), autori: s.data.autori })),
+  ...anotace.map((a) => ({ nazev: `Anotace: ${a.data.title}`, href: url('material/literatura/'), autori: a.data.autori })),
+  ...hadanky.map((h) => ({ nazev: `Hádanka: ${h.data.title}`, href: url('workshop/hadanky/'), autori: h.data.autori })),
+];
+
+const podleClenu = SITE.tym.map((jmeno) => ({
+  jmeno,
+  texty: texty.filter((t) => t.autori.includes(jmeno)),
+}));
+---
+
+<StrankaMaterialu id="autori" cislo="06">
+  <h2>Autorství textů na webu</h2>
+  <p class="mono">Generováno automaticky z pole „autori“ v jednotlivých souborech.</p>
+  <table class="tabulka">
+    <thead>
+      <tr><th scope="col">Člen</th><th scope="col">Texty</th></tr>
+    </thead>
+    <tbody>
+      {
+        podleClenu.map((c) => (
+          <tr>
+            <td>{c.jmeno}</td>
+            <td>
+              {c.texty.length === 0 ? (
+                <span class="mono">—</span>
+              ) : (
+                c.texty.map((t, i) => (
+                  <>
+                    {i > 0 && ', '}
+                    <a href={t.href}>{t.nazev}</a>
+                  </>
+                ))
+              )}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</StrankaMaterialu>

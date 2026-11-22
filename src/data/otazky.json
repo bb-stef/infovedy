@@ -1,0 +1,26 @@
+[
+  {
+    "id": "q01",
+    "otazka": "Které tři vlastnosti tvořily původní model 3V?",
+    "moznosti": [
+      "Volume, Velocity, Variety",
+      "Volume, Value, Veracity",
+      "Velocity, Visibility, Validity",
+      "Variety, Variability, Verdict"
+    ],
+    "spravna": 0,
+    "vysvetleni": "Původní model tvořil objem, rychlost a různorodost; další V byla doplněna později. (Ukázková otázka – nahradit.)"
+  },
+  {
+    "id": "q02",
+    "otazka": "Který z příkladů představuje polostrukturovaná data?",
+    "moznosti": [
+      "Výpůjční záznamy v knihovním systému",
+      "Soubor ve formátu JSON",
+      "Fotografie z mobilního telefonu",
+      "Volný text e-mailu"
+    ],
+    "spravna": 1,
+    "vysvetleni": "JSON a XML mají organizační prvky, ale ne pevnou tabulkovou strukturu. (Ukázková otázka – nahradit.)"
+  }
+]

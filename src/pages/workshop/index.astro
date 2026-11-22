@@ -1,0 +1,83 @@
+---
+import { getEntry, render } from 'astro:content';
+import StrankaLayout from '../../layouts/StrankaLayout.astro';
+import { SITE, url } from '../../lib/site';
+
+const entry = await getEntry('stranky', 'workshop');
+if (!entry) throw new Error('Chybí src/content/stranky/workshop.md');
+const { Content } = await render(entry);
+const osnova = entry.data.osnova ?? [];
+const celkem = osnova.reduce((s, b) => s + b.minuty, 0);
+
+let start = 0;
+const bloky = osnova.map((b) => {
+  const od = start;
+  start += b.minuty;
+  return { ...b, od, do: start };
+});
+const fmt = (m: number) => `${String(Math.floor(m / 60))}:${String(m % 60).padStart(2, '0')}`;
+---
+
+<StrankaLayout
+  title={entry.data.title}
+  popis={entry.data.popis}
+  oznaceni="Část 2"
+  autori={entry.data.autori}
+  stav={entry.data.stav}
+>
+  <section aria-labelledby="online">
+    <h2 id="online" style="margin-top: 0">Pro práci v hodině</h2>
+    <div class="mrizka">
+      <a class="karta" href={url('workshop/big-data-nebo-ne/')}>
+        <p class="label">Aktivita 1</p>
+        <h3>Big data, nebo ne?</h3>
+        <p>Kartičky s typy dat k třídění. Verze pro projektor i pro tisk.</p>
+      </a>
+      <a class="karta" href={url('workshop/hadanky/')}>
+        <p class="label">Aktivita 2</p>
+        <h3>Hádanky</h3>
+        <p>Případy, kdy data vedla ke špatnému závěru. Příčina se odhalí až po diskuzi.</p>
+      </a>
+      {
+        SITE.mentimeterUrl ? (
+          <a class="karta" href={SITE.mentimeterUrl}>
+            <p class="label">Interaktivní hlasování</p>
+            <h3>Mentimeter</h3>
+            <p>Brainstorming a otázky v průběhu workshopu.</p>
+          </a>
+        ) : (
+          <div class="karta">
+            <p class="label">Interaktivní hlasování</p>
+            <h3>Mentimeter</h3>
+            <p>Odkaz doplníme, až bude prezentace připravená.</p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="osnova-nadpis">
+    <h2 id="osnova-nadpis">Osnova · {celkem} min</h2>
+    <div class="casova-osa" aria-hidden="true">
+      {bloky.map((b) => <span style={`flex: ${b.minuty}`} title={b.nazev} />)}
+    </div>
+    <ol class="osnova">
+      {
+        bloky.map((b) => (
+          <li>
+            <span class="osnova__cas">
+              {fmt(b.od)}–{fmt(b.do)}
+              <small>{b.minuty} min</small>
+            </span>
+            <div>
+              <strong>{b.nazev}</strong>
+              {b.popis && <p>{b.popis}</p>}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <div class="prose" style="margin-top: 1rem"><Content /></div>
+</StrankaLayout>

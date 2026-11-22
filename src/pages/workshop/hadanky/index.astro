@@ -1,0 +1,63 @@
+---
+import { getCollection, render } from 'astro:content';
+import StrankaLayout from '../../../layouts/StrankaLayout.astro';
+import StavBadge from '../../../components/StavBadge.astro';
+import { url } from '../../../lib/site';
+
+const hadanky = await Promise.all(
+  (await getCollection('hadanky'))
+    .sort((a, b) => a.data.poradi - b.data.poradi)
+    .map(async (h) => ({ ...h, Content: (await render(h)).Content })),
+);
+---
+
+<StrankaLayout
+  title="Hádanky"
+  popis="Mít data neznamená mít automaticky správnou odpověď. Co se v těchto případech pokazilo?"
+  oznaceni="Workshop · aktivita 2"
+  nadrazena={{ nazev: 'Workshop', href: url('workshop/') }}
+>
+  <div class="akce">
+    <button type="button" class="btn" id="projekce" aria-pressed="false">Režim projekce</button>
+  </div>
+
+  {
+    hadanky.map(({ data, Content }) => (
+      <article class="hadanka">
+        <p class="meta">
+          <span>Případ {String(data.poradi).padStart(2, '0')}</span>
+          {data.autori.length > 0 && <span>{data.autori.join(', ')}</span>}
+          <StavBadge stav={data.stav} />
+        </p>
+        <h2>{data.title}</h2>
+        <p class="hadanka__situace">{data.situace}</p>
+        <p class="hadanka__otazka">{data.otazka}</p>
+        <details>
+          <summary>Odhalit příčinu</summary>
+          <div class="hadanka__odpoved">
+            <div class="prose">
+              <Content />
+            </div>
+            {data.zdroje.length > 0 && (
+              <ul class="zdroje">
+                {data.zdroje.map((z) => (
+                  <li>
+                    <a href={z.odkaz}>{z.nazev}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </details>
+      </article>
+    ))
+  }
+</StrankaLayout>
+
+<script>
+  const projekce = document.querySelector<HTMLButtonElement>('#projekce');
+  projekce?.addEventListener('click', () => {
+    const zapnuto = document.body.classList.toggle('projekce');
+    projekce.setAttribute('aria-pressed', String(zapnuto));
+  });
+</script>

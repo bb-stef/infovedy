@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import StrankaLayout from '../../../layouts/StrankaLayout.astro';
+import { url } from '../../../lib/site';
+
+const karticky = await getCollection('karticky');
+---
+
+<StrankaLayout
+  title="Big data, nebo ne?"
+  popis="Rozdělte kartičky na big data a ne-big data. Neexistuje pevná hranice – důležité je zdůvodnění."
+  oznaceni="Workshop · aktivita 1"
+  nadrazena={{ nazev: 'Workshop', href: url('workshop/') }}
+>
+  <div class="akce">
+    <button type="button" class="btn" id="projekce" aria-pressed="false">Režim projekce</button>
+    <button type="button" class="btn" id="tisk">Vytisknout kartičky</button>
+    <span class="mono">Kartičky se doplňují do src/data/karticky.json</span>
+  </div>
+
+  <div class="karticky" id="karticky">
+    {
+      karticky.map((k, i) => (
+        <div class="karticka">
+          <p>{k.data.text}</p>
+          <span class="mono">
+            {String(i + 1).padStart(2, '0')}
+            {k.data.poznamka && ` · ${k.data.poznamka}`}
+          </span>
+        </div>
+      ))
+    }
+  </div>
+</StrankaLayout>
+
+<script>
+  const projekce = document.querySelector<HTMLButtonElement>('#projekce');
+  projekce?.addEventListener('click', () => {
+    const zapnuto = document.body.classList.toggle('projekce');
+    projekce.setAttribute('aria-pressed', String(zapnuto));
+  });
+  document.querySelector('#tisk')?.addEventListener('click', () => window.print());
+</script>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ObsahMaterialu from '../components/ObsahMaterialu.astro';
+import StavBadge from '../components/StavBadge.astro';
+import { getKapitoly, type Stav } from '../lib/site';
+
+interface Props {
+  /** Číslo kapitoly 01–06. */
+  cislo: string;
+  title: string;
+  popis?: string;
+  autori?: string[];
+  stav?: Stav;
+  aktualizovano?: Date;
+  /** Drobečková navigace pod kapitolou (např. u jednotlivé sondy). */
+  nadrazena?: { nazev: string; href: string };
+}
+
+const { cislo, title, popis, autori = [], stav, aktualizovano, nadrazena } = Astro.props;
+const kapitoly = await getKapitoly();
+const index = kapitoly.findIndex((k) => k.cislo === cislo);
+const predchozi = nadrazena ? undefined : kapitoly[index - 1];
+const dalsi = nadrazena ? undefined : kapitoly[index + 1];
+const datum = aktualizovano?.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' });
+---
+
+<BaseLayout title={title} description={popis}>
+  <div class="wrap material">
+    <aside class="material__aside" aria-label="Obsah materiálu">
+      <p class="label">Učební materiál</p>
+      <ObsahMaterialu kapitoly={kapitoly} aktivni={cislo} />
+    </aside>
+
+    <details class="material__toc-mobile">
+      <summary>Obsah materiálu</summary>
+      <ObsahMaterialu kapitoly={kapitoly} aktivni={cislo} />
+    </details>
+
+    <article class="material__body">
+      <header class="page-head">
+        <p class="meta">
+          {nadrazena ? <a href={nadrazena.href}>{cislo} · {nadrazena.nazev}</a> : <span>{cislo}</span>}
+          {autori.length > 0 && <span>autoři: {autori.join(', ')}</span>}
+          {datum && <span>aktualizováno {datum}</span>}
+          {stav && <StavBadge stav={stav} />}
+        </p>
+        <h1>{title}</h1>
+        {popis && <p class="lead">{popis}</p>}
+      </header>
+
+      <slot />
+
+      {
+        (predchozi || dalsi) && (
+          <nav class="pager" aria-label="Další kapitoly">
+            {predchozi ? (
+              <a href={predchozi.href} rel="prev">
+                <span class="label">← Předchozí</span>
+                {predchozi.cislo} {predchozi.nazev}
+              </a>
+            ) : (
+              <span />
+            )}
+            {dalsi && (
+              <a href={dalsi.href} rel="next" class="pager__next">
+                <span class="label">Další →</span>
+                {dalsi.cislo} {dalsi.nazev}
+              </a>
+            )}
+          </nav>
+        )
+      }
+    </article>
+  </div>
+</BaseLayout>

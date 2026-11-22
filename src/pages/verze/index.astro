@@ -1,0 +1,12 @@
+---
+import { getEntry, render } from 'astro:content';
+import StrankaLayout from '../../layouts/StrankaLayout.astro';
+
+const entry = await getEntry('stranky', 'verze');
+if (!entry) throw new Error('Chybí src/content/stranky/verze.md');
+const { Content } = await render(entry);
+---
+
+<StrankaLayout title={entry.data.title} popis={entry.data.popis} autori={entry.data.autori} stav={entry.data.stav}>
+  <div class="prose"><Content /></div>
+</StrankaLayout>

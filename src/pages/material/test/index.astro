@@ -1,0 +1,139 @@
+---
+import { getCollection } from 'astro:content';
+import MaterialLayout from '../../../layouts/MaterialLayout.astro';
+import { CILE } from '../../../lib/site';
+
+const otazky = await getCollection('otazky');
+const pismena = ['A', 'B', 'C', 'D'];
+const stav = otazky.length === 0 ? 'chybi' : otazky.length >= CILE.otazky ? 'hotovo' : 'koncept';
+---
+
+<MaterialLayout
+  cislo="05"
+  title="Testové otázky"
+  popis={`Ověřte si, co jste se dozvěděli. ${CILE.otazky} otázek, u každé jedna správná odpověď ze čtyř.`}
+  autori={['David']}
+  stav={stav}
+>
+  {
+    otazky.length < CILE.otazky && (
+      <div class="upozorneni">
+        <p>
+          Pracovní verze: zatím {otazky.length} z {CILE.otazky} otázek. Otázky se doplňují do
+          <code>src/data/otazky.json</code>.
+        </p>
+      </div>
+    )
+  }
+
+  <form class="test" id="test" novalidate>
+    {
+      otazky.map((q, i) => (
+        <fieldset class="otazka" data-spravna={q.data.spravna}>
+          <legend>
+            <span class="mono">
+              Otázka {i + 1} / {otazky.length}
+            </span>
+            {q.data.otazka}
+          </legend>
+          <div>
+            {q.data.moznosti.map((m, j) => (
+              <label class:list={['moznost', { 'je-spravna': j === q.data.spravna }]}>
+                <input type="radio" name={q.id} value={j} />
+                <span class="moznost__pismeno">{pismena[j]}</span>
+                <span>{m}</span>
+              </label>
+            ))}
+          </div>
+          <p class="otazka__chyba" role="alert">Vyberte jednu z odpovědí.</p>
+          <p class="otazka__vysledek">
+            <strong>Správně: {pismena[q.data.spravna]}.</strong> {q.data.vysvetleni}
+          </p>
+        </fieldset>
+      ))
+    }
+
+    <div class="akce">
+      <button type="submit" class="btn btn--hlavni">Vyhodnotit</button>
+      <button type="button" class="btn" id="znovu" hidden>Zkusit znovu</button>
+      <button type="button" class="btn" id="klic">Zobrazit klíč</button>
+      <button type="button" class="btn" id="tisk">Vytisknout</button>
+      <p class="skore" id="skore" aria-live="polite" hidden></p>
+      <p class="form-chyba" id="form-chyba" aria-live="polite"></p>
+    </div>
+  </form>
+</MaterialLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#test');
+  const skore = document.querySelector<HTMLParagraphElement>('#skore');
+  const chyba = document.querySelector<HTMLParagraphElement>('#form-chyba');
+  const znovu = document.querySelector<HTMLButtonElement>('#znovu');
+  const klic = document.querySelector<HTMLButtonElement>('#klic');
+  const tisk = document.querySelector<HTMLButtonElement>('#tisk');
+
+  if (form && skore && chyba && znovu && klic && tisk) {
+    const otazky = Array.from(form.querySelectorAll<HTMLFieldSetElement>('.otazka'));
+
+    const vybrana = (o: HTMLFieldSetElement) =>
+      o.querySelector<HTMLInputElement>('input[type="radio"]:checked');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nezodpovezene = otazky.filter((o) => !vybrana(o));
+      otazky.forEach((o) => o.classList.toggle('je-nezodpovezena', !vybrana(o)));
+
+      if (nezodpovezene.length > 0) {
+        chyba.textContent = `Nezodpovězené otázky: ${nezodpovezene.length}. Odpovězte prosím na všechny.`;
+        nezodpovezene[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nezodpovezene[0].querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true });
+        return;
+      }
+
+      chyba.textContent = '';
+      let spravne = 0;
+      otazky.forEach((o) => {
+        const odpoved = vybrana(o)!;
+        const ok = Number(odpoved.value) === Number(o.dataset.spravna);
+        if (ok) spravne++;
+        o.classList.toggle('je-ok', ok);
+        o.classList.toggle('je-chyba', !ok);
+        o.querySelectorAll('.moznost').forEach((m) => m.classList.remove('je-spatna'));
+        if (!ok) odpoved.closest('.moznost')?.classList.add('je-spatna');
+        o.querySelectorAll('input').forEach((i) => (i.disabled = true));
+      });
+
+      form.classList.add('je-vyhodnoceno');
+      skore.hidden = false;
+      skore.textContent = `Výsledek: ${spravne} / ${otazky.length}`;
+      znovu.hidden = false;
+    });
+
+    // Zrušit chybové označení, jakmile uživatel odpoví.
+    form.addEventListener('change', (e) => {
+      const o = (e.target as HTMLElement).closest<HTMLFieldSetElement>('.otazka');
+      if (o) o.classList.remove('je-nezodpovezena');
+      if (!otazky.some((q) => q.classList.contains('je-nezodpovezena'))) chyba.textContent = '';
+    });
+
+    znovu.addEventListener('click', () => {
+      form.reset();
+      form.classList.remove('je-vyhodnoceno');
+      otazky.forEach((o) => {
+        o.classList.remove('je-ok', 'je-chyba');
+        o.querySelectorAll('.moznost').forEach((m) => m.classList.remove('je-spatna'));
+        o.querySelectorAll('input').forEach((i) => (i.disabled = false));
+      });
+      skore.hidden = true;
+      znovu.hidden = true;
+      otazky[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    klic.addEventListener('click', () => {
+      const zobrazen = form.classList.toggle('ukaz-klic');
+      klic.textContent = zobrazen ? 'Skrýt klíč' : 'Zobrazit klíč';
+    });
+
+    tisk.addEventListener('click', () => window.print());
+  }
+</script>
