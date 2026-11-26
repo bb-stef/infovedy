@@ -15,68 +15,87 @@ const bloky = osnova.map((b) => {
   start += b.minuty;
   return { ...b, od, do: start };
 });
-const fmt = (m: number) => `${String(Math.floor(m / 60))}:${String(m % 60).padStart(2, '0')}`;
+const fmt = (m: number) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
 ---
 
 <StrankaLayout
   title={entry.data.title}
   popis={entry.data.popis}
-  oznaceni="Část 2"
+  oznaceni="Část druhá"
   autori={entry.data.autori}
   stav={entry.data.stav}
 >
-  <section aria-labelledby="online">
-    <h2 id="online" style="margin-top: 0">Pro práci v hodině</h2>
-    <div class="mrizka">
-      <a class="karta" href={url('workshop/big-data-nebo-ne/')}>
-        <p class="label">Aktivita 1</p>
-        <h3>Big data, nebo ne?</h3>
-        <p>Kartičky s typy dat k třídění. Verze pro projektor i pro tisk.</p>
-      </a>
-      <a class="karta" href={url('workshop/hadanky/')}>
-        <p class="label">Aktivita 2</p>
-        <h3>Hádanky</h3>
-        <p>Případy, kdy data vedla ke špatnému závěru. Příčina se odhalí až po diskuzi.</p>
-      </a>
-      {
-        SITE.mentimeterUrl ? (
-          <a class="karta" href={SITE.mentimeterUrl}>
-            <p class="label">Interaktivní hlasování</p>
-            <h3>Mentimeter</h3>
-            <p>Brainstorming a otázky v průběhu workshopu.</p>
-          </a>
-        ) : (
-          <div class="karta">
-            <p class="label">Interaktivní hlasování</p>
-            <h3>Mentimeter</h3>
-            <p>Odkaz doplníme, až bude prezentace připravená.</p>
-          </div>
-        )
-      }
-    </div>
+  <section aria-labelledby="aktivity">
+    <h2 id="aktivity" style="margin-top: 0">Do hodiny</h2>
+    <ol class="radky">
+      <li>
+        <a class="radek" href={url('workshop/big-data-nebo-ne/')}>
+          <span class="radek__cislo">1</span>
+          <span>
+            <span class="radek__nazev">Big data, nebo ne?</span>
+            <span class="radek__popis">Třídění pojmů v Mentimetru. Zde jako záložní kartičky na projektor nebo k vytištění.</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="radek" href={url('workshop/hadanky/')}>
+          <span class="radek__cislo">2</span>
+          <span>
+            <span class="radek__nazev">Hádanky</span>
+            <span class="radek__popis">Případy, kdy data vedla ke špatnému závěru. Příčina se odhalí až po diskuzi.</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        {
+          SITE.mentimeterUrl ? (
+            <a class="radek" href={SITE.mentimeterUrl}>
+              <span class="radek__cislo">M</span>
+              <span>
+                <span class="radek__nazev">Mentimeter</span>
+                <span class="radek__popis">Hlasování a brainstorming během workshopu.</span>
+              </span>
+            </a>
+          ) : (
+            <div class="radek">
+              <span class="radek__cislo">M</span>
+              <span>
+                <span class="radek__nazev">Mentimeter</span>
+                <span class="radek__popis">Odkaz na hlasování doplníme před workshopem.</span>
+              </span>
+            </div>
+          )
+        }
+      </li>
+    </ol>
   </section>
 
-  <section aria-labelledby="osnova-nadpis">
-    <h2 id="osnova-nadpis">Osnova · {celkem} min</h2>
-    <div class="casova-osa" aria-hidden="true">
-      {bloky.map((b) => <span style={`flex: ${b.minuty}`} title={b.nazev} />)}
-    </div>
-    <ol class="osnova">
-      {
-        bloky.map((b) => (
-          <li>
-            <span class="osnova__cas">
-              {fmt(b.od)}–{fmt(b.do)}
-              <small>{b.minuty} min</small>
-            </span>
-            <div>
-              <strong>{b.nazev}</strong>
-              {b.popis && <p>{b.popis}</p>}
-            </div>
-          </li>
-        ))
-      }
-    </ol>
+  <section aria-labelledby="program-nadpis">
+    <h2 id="program-nadpis">Program</h2>
+    <table class="program">
+      <tbody>
+        {
+          bloky.map((b) => (
+            <tr>
+              <td class="program__cas">
+                {fmt(b.od)}–{fmt(b.do)}
+                <small>{b.minuty} min</small>
+              </td>
+              <td>
+                <strong>{b.nazev}</strong>
+                {b.popis && <p>{b.popis}</p>}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="program__cas">celkem</td>
+          <td>{celkem} minut</td>
+        </tr>
+      </tfoot>
+    </table>
   </section>
 
   <div class="prose" style="margin-top: 1rem"><Content /></div>

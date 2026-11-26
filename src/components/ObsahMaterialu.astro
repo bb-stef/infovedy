@@ -15,7 +15,7 @@ const { kapitoly, aktivni } = Astro.props;
     kapitoly.map((k) => (
       <li>
         <a href={k.href} aria-current={k.cislo === aktivni ? 'page' : undefined}>
-          <span class="toc__cislo">{k.cislo}</span>
+          <span class="toc__cislo">{Number(k.cislo)}</span>
           <span class="toc__nazev">{k.nazev}</span>
           <StavBadge stav={k.stav} tecka />
         </a>

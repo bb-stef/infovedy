@@ -1,4 +1,7 @@
 ---
+import '@fontsource-variable/newsreader/opsz.css';
+import '@fontsource-variable/newsreader/opsz-italic.css';
+import '@fontsource-variable/schibsted-grotesk/wght.css';
 import '../styles/global.css';
 import { SITE, url } from '../lib/site';
 import MotivPrepinac from '../components/MotivPrepinac.astro';
@@ -10,7 +13,8 @@ interface Props {
 
 const { title, description = 'Digitální učební materiál a workshop k tématu big data. ISKM01 Informační vědy, KISK FF MU.' } =
   Astro.props;
-const pageTitle = title ? `${title} · ${SITE.nazev}` : `${SITE.nazev} · ${SITE.predmetKod}`;
+const pageTitle = title ? `${title} — ${SITE.nazev}` : `${SITE.nazev} — ${SITE.predmet}`;
+const vyvoj = import.meta.env.DEV;
 
 const path = Astro.url.pathname;
 const nav = [
@@ -22,18 +26,25 @@ const nav = [
 ---
 
 <!doctype html>
-<html lang="cs">
+<html lang="cs" class:list={{ pracovni: vyvoj }}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{pageTitle}</title>
     <script is:inline>
-      // Nastaví uložený motiv ještě před vykreslením (viz MotivPrepinac.astro).
+      // Nastaví uložený motiv ještě před vykreslením (viz MotivPrepinac.astro)
+      // a pracovní režim se stavem rozpracovanosti (?stav zapne, ?stav=0 vypne).
       document.documentElement.classList.add('js');
       try {
         var m = localStorage.getItem('infovedy-motiv');
         if (m === 'svetly' || m === 'tmavy') document.documentElement.dataset.motiv = m;
+        var q = new URLSearchParams(location.search);
+        if (q.has('stav')) {
+          if (q.get('stav') === '0') localStorage.removeItem('infovedy-stav');
+          else localStorage.setItem('infovedy-stav', '1');
+        }
+        if (localStorage.getItem('infovedy-stav') === '1') document.documentElement.classList.add('pracovni');
       } catch (e) {}
     </script>
   </head>
@@ -67,9 +78,9 @@ const nav = [
     <footer class="site-footer">
       <div class="wrap site-footer__inner">
         <span>
-          {SITE.predmet} · <a href={SITE.instituceUrl}>{SITE.instituce}</a> · {SITE.semestr}
+          Týmový výstup předmětu {SITE.predmet}, <a href={SITE.instituceUrl}>{SITE.instituce}</a>, {SITE.semestr}.
         </span>
-        <a href={url('material/autori/')}>Tým projektu</a>
+        <a href={url('material/autori/')}>Kdo co dělal</a>
       </div>
     </footer>
   </body>

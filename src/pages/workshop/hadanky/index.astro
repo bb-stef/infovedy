@@ -14,7 +14,7 @@ const hadanky = await Promise.all(
 <StrankaLayout
   title="Hádanky"
   popis="Mít data neznamená mít automaticky správnou odpověď. Co se v těchto případech pokazilo?"
-  oznaceni="Workshop · aktivita 2"
+  oznaceni="aktivita 2"
   nadrazena={{ nazev: 'Workshop', href: url('workshop/') }}
 >
   <div class="akce">
@@ -24,12 +24,12 @@ const hadanky = await Promise.all(
   {
     hadanky.map(({ data, Content }) => (
       <article class="hadanka">
-        <p class="meta">
-          <span>Případ {String(data.poradi).padStart(2, '0')}</span>
-          {data.autori.length > 0 && <span>{data.autori.join(', ')}</span>}
-          <StavBadge stav={data.stav} />
+        <p class="label">
+          Případ {data.poradi}
+          {data.autori.length > 0 && <span class="mono"> — {data.autori.join(', ')}</span>}
         </p>
         <h2>{data.title}</h2>
+        <StavBadge stav={data.stav} />
         <p class="hadanka__situace">{data.situace}</p>
         <p class="hadanka__otazka">{data.otazka}</p>
         <details>

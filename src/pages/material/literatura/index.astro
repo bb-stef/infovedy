@@ -12,27 +12,30 @@ const anotace = await Promise.all(
 
 <StrankaMaterialu id="literatura" cislo="04">
   <section slot="pred" aria-labelledby="anotace-nadpis" style="margin-bottom: 3rem">
-    <h2 id="anotace-nadpis" style="margin-top: 0">Klíčové anotované texty</h2>
-    <p class="mono">U každého textu: návaznost na téma · přínos · percepce</p>
+    <h2 id="anotace-nadpis" style="margin-top: 0">Klíčové texty</h2>
+    <p class="upozorneni">
+      <span>U každého textu uvádíme, jak navazuje na téma, co přináší a jak byl přijat.</span>
+    </p>
     {
       anotace.length === 0 ? (
         <div class="prazdne">
           <p>
-            Zatím žádné anotace. Šablona je v <code>src/content/anotace/_sablona.md</code>.
+            Anotace připravujeme.
+            <span class="jen-pracovni"> Šablona: <code>src/content/anotace/_sablona.md</code>.</span>
           </p>
         </div>
       ) : (
         anotace.map(({ data, Content }) => (
           <article class="anotace">
-            <p class="meta">
-              <span>{String(data.poradi).padStart(2, '0')}</span>
-              {data.autori.length > 0 && <span>anotace: {data.autori.join(', ')}</span>}
-              <StavBadge stav={data.stav} />
+            <p class="label">
+              {data.poradi}. text
+              {data.autori.length > 0 && <span class="mono"> — anotace: {data.autori.join(', ')}</span>}
             </p>
-            <h2>{data.title}</h2>
+            <h3>{data.title}</h3>
             <p class="anotace__citace">
               {data.citace} {data.odkaz && <a href={data.odkaz}>{data.odkaz}</a>}
             </p>
+            <StavBadge stav={data.stav} />
             <div class="prose">
               <Content />
             </div>
@@ -40,6 +43,6 @@ const anotace = await Promise.all(
         ))
       )
     }
-    <h2 style="margin-top: 3rem">Seznam použité literatury</h2>
+    <h2 style="margin-top: 3.5rem">Seznam použité literatury</h2>
   </section>
 </StrankaMaterialu>

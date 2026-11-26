@@ -8,33 +8,28 @@ const kapitoly = await getKapitoly();
 const sondy = await getCollection('sondy');
 const anotace = await getCollection('anotace');
 const otazky = await getCollection('otazky');
-const hotoveSondy = sondy.filter((s) => s.data.stav !== 'chybi').length;
+const rozpracovaneSondy = sondy.filter((s) => s.data.stav !== 'chybi').length;
 ---
 
 <BaseLayout>
-  <section class="hero">
-    <div class="wrap hero__inner">
-      <p class="meta">
-        <span>{SITE.predmet}</span><span>{SITE.instituce}</span><span>{SITE.semestr}</span>
-      </p>
-      <h1>{SITE.nazev}</h1>
-      <p class="lead">Digitální učební materiál a workshop k tématu big data.</p>
-    </div>
-  </section>
-
   <div class="wrap">
-    <div class="rozcestnik">
-      <section class="karta karta--hlavni" aria-labelledby="cast-1">
-        <p class="label">Část 1 · hlavní výstup</p>
-        <h2 id="cast-1"><a href={url('material/')}>Učební materiál</a></h2>
-        <p>Teorie, přístupy, sondy do výzkumu a praxe, anotovaná literatura a test.</p>
-        <ol class="karta-toc">
+    <header class="titul">
+      <p class="titul__horni">{SITE.predmet} — {SITE.instituce} — {SITE.semestr}</p>
+      <h1>Big Data</h1>
+      <p class="titul__podtitul">Studijní materiál a&nbsp;workshop o&nbsp;tom, co velká data jsou, k&nbsp;čemu slouží a&nbsp;kde selhávají.</p>
+    </header>
+
+    <div class="titul-obsah">
+      <section aria-labelledby="obsah-nadpis">
+        <h2 id="obsah-nadpis"><a href={url('material/')}>Učební materiál</a></h2>
+        <ol class="knizni-obsah">
           {
             kapitoly.map((k) => (
               <li>
                 <a href={k.href}>
-                  <span class="toc__cislo">{k.cislo}</span>
+                  <span class="toc__cislo">{Number(k.cislo)}</span>
                   <span class="toc__nazev">{k.nazev}</span>
+                  <span class="voditko" aria-hidden="true" />
                   <StavBadge stav={k.stav} tecka />
                 </a>
               </li>
@@ -43,49 +38,36 @@ const hotoveSondy = sondy.filter((s) => s.data.stav !== 'chybi').length;
         </ol>
       </section>
 
-      <a class="karta" href={url('workshop/')} aria-labelledby="cast-2">
-        <p class="label">Část 2</p>
-        <h2 id="cast-2">Workshop</h2>
-        <p>45minutová edukační jednotka s aktivitami pro práci v hodině.</p>
-        <p class="meta" style="margin-top: 1rem">
-          {SITE.terminyWorkshopu.map((t) => <span>{t}</span>)}
-        </p>
-      </a>
-    </div>
+      <div>
+        <section class="blok" aria-labelledby="workshop-nadpis">
+          <h2 id="workshop-nadpis"><a href={url('workshop/')}>Workshop</a></h2>
+          <p>Pětačtyřicet minut práce s&nbsp;reálnými případy pro dvě další skupiny.</p>
+          <ul class="terminy">
+            {SITE.terminyWorkshopu.map((t, i) => (
+              <li>
+                <span class="mono">{i + 1}. termín</span>
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+          <p><a href={url('workshop/')}>Program a aktivity</a></p>
+        </section>
 
-    <div class="statistiky" aria-label="Stav rozpracovanosti">
-      <div class="statistika">
-        <strong>{hotoveSondy}<small> / {CILE.sondy}</small></strong>
-        <span>rozpracovaných sond</span>
-      </div>
-      <div class="statistika">
-        <strong>{anotace.length}<small> / {CILE.anotaceMin}–{CILE.anotaceMax}</small></strong>
-        <span>anotovaných textů</span>
-      </div>
-      <div class="statistika">
-        <strong>{otazky.length}<small> / {CILE.otazky}</small></strong>
-        <span>testových otázek</span>
-      </div>
-      <div class="statistika">
-        <strong>{SITE.tym.length}</strong>
-        <span>členů týmu</span>
+        <section class="blok tiraz" aria-labelledby="tiraz-nadpis">
+          <h2 id="tiraz-nadpis">Připravili</h2>
+          <p>{SITE.tym.join(', ')}.</p>
+          <p>
+            Materiál prochází dvěma koly úprav podle zpětné vazby — co se změnilo, je v&nbsp;<a href={url('verze/')}>úpravách</a>.
+          </p>
+        </section>
       </div>
     </div>
 
-    <div class="o-projektu">
-      <section>
-        <h2>O projektu</h2>
-        <p>
-          Týmový výstup předmětu {SITE.predmet} na <a href={SITE.instituceUrl}>{SITE.instituce}</a>. Materiál
-          prochází dvěma koly úprav podle zpětné vazby ostatních skupin a účastníků workshopu – viz
-          <a href={url('verze/')}>úpravy po zpětné vazbě</a>.
-        </p>
-      </section>
-      <section>
-        <h2>Tým</h2>
-        <ul class="tym">{SITE.tym.map((jmeno) => <li>{jmeno}</li>)}</ul>
-        <p style="margin-top: 0.6rem"><a href={url('material/autori/')}>Kdo co dělal</a></p>
-      </section>
-    </div>
+    <aside class="pracovni-poznamka jen-pracovni" aria-label="Stav rozpracovanosti">
+      <p>
+        <strong>Pracovní režim.</strong> Sondy {rozpracovaneSondy}/{CILE.sondy}, anotace {anotace.length}/{CILE.anotaceMin}–{CILE.anotaceMax},
+        otázky {otazky.length}/{CILE.otazky}. Vidí jen tým (vypnout: <a href="?stav=0">?stav=0</a>).
+      </p>
+    </aside>
   </div>
 </BaseLayout>

@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import MaterialLayout from '../../../layouts/MaterialLayout.astro';
 import StavBadge from '../../../components/StavBadge.astro';
-import { url } from '../../../lib/site';
+import { rimske, url } from '../../../lib/site';
 
 const sondy = (await getCollection('sondy')).sort((a, b) => a.data.poradi - b.data.poradi);
 ---
@@ -10,21 +10,25 @@ const sondy = (await getCollection('sondy')).sort((a, b) => a.data.poradi - b.da
 <MaterialLayout
   cislo="03"
   title="Sondy"
-  popis="Co se v tématu big data zkoumá nebo aplikačně řeší a jak. Každá sonda má stejnou osnovu: co se zkoumá, jak, co z toho plyne a zdroje."
+  popis="Co se v tématu big data zkoumá nebo aplikačně řeší a jak. Každá sonda odpovídá na stejné otázky: co se zkoumá, jakými daty a metodou, a co z toho plyne."
 >
-  <div class="mrizka">
+  <ol class="radky">
     {
       sondy.map((s) => (
-        <a class="karta" href={url(`material/sondy/${s.id}/`)}>
-          <p class="label">Sonda {String(s.data.poradi).padStart(2, '0')}</p>
-          <h2>{s.data.title}</h2>
-          {s.data.perex && <p>{s.data.perex}</p>}
-          <div class="karta__pata">
-            <span class="mono">{s.data.autori.join(', ')}</span>
-            <StavBadge stav={s.data.stav} />
-          </div>
-        </a>
+        <li>
+          <a class="radek" href={url(`material/sondy/${s.id}/`)}>
+            <span class="radek__cislo">{rimske(s.data.poradi)}</span>
+            <span>
+              <span class="radek__nazev">{s.data.title}</span>
+              {s.data.perex && <span class="radek__popis">{s.data.perex}</span>}
+            </span>
+            <span class="radek__meta">
+              {s.data.autori.length > 0 && <span>{s.data.autori.join(', ')}</span>}
+              <StavBadge stav={s.data.stav} />
+            </span>
+          </a>
+        </li>
       ))
     }
-  </div>
+  </ol>
 </MaterialLayout>

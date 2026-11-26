@@ -9,13 +9,13 @@ const karticky = await getCollection('karticky');
 <StrankaLayout
   title="Big data, nebo ne?"
   popis="Rozdělte kartičky na big data a ne-big data. Neexistuje pevná hranice – důležité je zdůvodnění."
-  oznaceni="Workshop · aktivita 1"
+  oznaceni="aktivita 1"
   nadrazena={{ nazev: 'Workshop', href: url('workshop/') }}
 >
   <div class="akce">
     <button type="button" class="btn" id="projekce" aria-pressed="false">Režim projekce</button>
-    <button type="button" class="btn" id="tisk">Vytisknout kartičky</button>
-    <span class="mono">Kartičky se doplňují do src/data/karticky.json</span>
+    <button type="button" class="btn btn--text" id="tisk">Vytisknout kartičky</button>
+    <span class="mono jen-pracovni">Kartičky se doplňují do src/data/karticky.json</span>
   </div>
 
   <div class="karticky" id="karticky">
@@ -24,8 +24,8 @@ const karticky = await getCollection('karticky');
         <div class="karticka">
           <p>{k.data.text}</p>
           <span class="mono">
-            {String(i + 1).padStart(2, '0')}
-            {k.data.poznamka && ` · ${k.data.poznamka}`}
+            {i + 1}
+            {k.data.poznamka && ` — ${k.data.poznamka}`}
           </span>
         </div>
       ))

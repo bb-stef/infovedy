@@ -22,6 +22,22 @@ export const SITE = {
 
 export const CILE = { sondy: 5, otazky: 20, anotaceMin: 5, anotaceMax: 7 } as const;
 
+/** Římská číslice (sondy se číslují I–V). */
+export function rimske(n: number): string {
+  const tabulka: [number, string][] = [
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+  ];
+  let zbytek = n;
+  let vysledek = '';
+  for (const [hodnota, znak] of tabulka) {
+    while (zbytek >= hodnota) {
+      vysledek += znak;
+      zbytek -= hodnota;
+    }
+  }
+  return vysledek || String(n);
+}
+
 export type Stav = 'chybi' | 'koncept' | 'hotovo';
 
 export const STAV_POPIS: Record<Stav, string> = {

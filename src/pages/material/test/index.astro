@@ -4,22 +4,22 @@ import MaterialLayout from '../../../layouts/MaterialLayout.astro';
 import { CILE } from '../../../lib/site';
 
 const otazky = await getCollection('otazky');
-const pismena = ['A', 'B', 'C', 'D'];
+const pismena = ['a', 'b', 'c', 'd'];
 const stav = otazky.length === 0 ? 'chybi' : otazky.length >= CILE.otazky ? 'hotovo' : 'koncept';
 ---
 
 <MaterialLayout
   cislo="05"
   title="Testové otázky"
-  popis={`Ověřte si, co jste se dozvěděli. ${CILE.otazky} otázek, u každé jedna správná odpověď ze čtyř.`}
+  popis={`Dvacet otázek k ověření, co jste si z materiálu odnesli. Vždy platí jen jedna odpověď.`}
   autori={['David']}
   stav={stav}
 >
   {
     otazky.length < CILE.otazky && (
-      <div class="upozorneni">
+      <div class="pracovni-poznamka jen-pracovni">
         <p>
-          Pracovní verze: zatím {otazky.length} z {CILE.otazky} otázek. Otázky se doplňují do
+          <strong>Pracovní režim.</strong> Zatím {otazky.length} z {CILE.otazky} otázek; doplňují se do
           <code>src/data/otazky.json</code>.
         </p>
       </div>
@@ -30,24 +30,23 @@ const stav = otazky.length === 0 ? 'chybi' : otazky.length >= CILE.otazky ? 'hot
     {
       otazky.map((q, i) => (
         <fieldset class="otazka" data-spravna={q.data.spravna}>
+          <span class="otazka__cislo" aria-hidden="true">{i + 1}.</span>
           <legend>
-            <span class="mono">
-              Otázka {i + 1} / {otazky.length}
-            </span>
+            <span class="sr-only">Otázka {i + 1} z {otazky.length}: </span>
             {q.data.otazka}
           </legend>
           <div>
             {q.data.moznosti.map((m, j) => (
               <label class:list={['moznost', { 'je-spravna': j === q.data.spravna }]}>
                 <input type="radio" name={q.id} value={j} />
-                <span class="moznost__pismeno">{pismena[j]}</span>
+                <span class="moznost__pismeno">{pismena[j]})</span>
                 <span>{m}</span>
               </label>
             ))}
           </div>
           <p class="otazka__chyba" role="alert">Vyberte jednu z odpovědí.</p>
           <p class="otazka__vysledek">
-            <strong>Správně: {pismena[q.data.spravna]}.</strong> {q.data.vysvetleni}
+            <strong>Správná odpověď: {pismena[q.data.spravna]})</strong> {q.data.vysvetleni}
           </p>
         </fieldset>
       ))
@@ -55,9 +54,9 @@ const stav = otazky.length === 0 ? 'chybi' : otazky.length >= CILE.otazky ? 'hot
 
     <div class="akce">
       <button type="submit" class="btn btn--hlavni">Vyhodnotit</button>
-      <button type="button" class="btn" id="znovu" hidden>Zkusit znovu</button>
-      <button type="button" class="btn" id="klic">Zobrazit klíč</button>
-      <button type="button" class="btn" id="tisk">Vytisknout</button>
+      <button type="button" class="btn btn--text" id="znovu" hidden>Zkusit znovu</button>
+      <button type="button" class="btn btn--text" id="klic">Zobrazit klíč</button>
+      <button type="button" class="btn btn--text" id="tisk">Vytisknout</button>
       <p class="skore" id="skore" aria-live="polite" hidden></p>
       <p class="form-chyba" id="form-chyba" aria-live="polite"></p>
     </div>

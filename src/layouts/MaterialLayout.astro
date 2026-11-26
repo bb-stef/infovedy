@@ -12,16 +12,18 @@ interface Props {
   autori?: string[];
   stav?: Stav;
   aktualizovano?: Date;
-  /** Drobečková navigace pod kapitolou (např. u jednotlivé sondy). */
+  /** Nadřazená stránka (např. u jednotlivé sondy). */
   nadrazena?: { nazev: string; href: string };
+  /** Vlastní označení místo „Kapitola N“ (např. „Sonda II“). */
+  oznaceni?: string;
 }
 
-const { cislo, title, popis, autori = [], stav, aktualizovano, nadrazena } = Astro.props;
+const { cislo, title, popis, autori = [], stav, aktualizovano, nadrazena, oznaceni } = Astro.props;
 const kapitoly = await getKapitoly();
 const index = kapitoly.findIndex((k) => k.cislo === cislo);
 const predchozi = nadrazena ? undefined : kapitoly[index - 1];
 const dalsi = nadrazena ? undefined : kapitoly[index + 1];
-const datum = aktualizovano?.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' });
+const datum = aktualizovano?.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 
 <BaseLayout title={title} description={popis}>
@@ -38,14 +40,22 @@ const datum = aktualizovano?.toLocaleDateString('cs-CZ', { day: 'numeric', month
 
     <article class="material__body">
       <header class="page-head">
-        <p class="meta">
-          {nadrazena ? <a href={nadrazena.href}>{cislo} · {nadrazena.nazev}</a> : <span>{cislo}</span>}
-          {autori.length > 0 && <span>autoři: {autori.join(', ')}</span>}
-          {datum && <span>aktualizováno {datum}</span>}
-          {stav && <StavBadge stav={stav} />}
+        <p class="label">
+          {nadrazena ? <a href={nadrazena.href}>{nadrazena.nazev}</a> : null}
+          {nadrazena && oznaceni ? ' — ' : null}
+          {oznaceni ?? (nadrazena ? null : `Kapitola ${Number(cislo)}`)}
         </p>
         <h1>{title}</h1>
         {popis && <p class="lead">{popis}</p>}
+        {
+          (autori.length > 0 || datum || stav) && (
+            <p class="meta">
+              {autori.length > 0 && <span>Text: {autori.join(', ')}</span>}
+              {datum && <span>Aktualizováno {datum}</span>}
+              {stav && <StavBadge stav={stav} />}
+            </p>
+          )
+        }
       </header>
 
       <slot />
@@ -53,18 +63,16 @@ const datum = aktualizovano?.toLocaleDateString('cs-CZ', { day: 'numeric', month
       {
         (predchozi || dalsi) && (
           <nav class="pager" aria-label="Další kapitoly">
-            {predchozi ? (
+            {predchozi && (
               <a href={predchozi.href} rel="prev">
-                <span class="label">← Předchozí</span>
-                {predchozi.cislo} {predchozi.nazev}
+                <span class="mono">← Kapitola {Number(predchozi.cislo)}</span>
+                <span>{predchozi.nazev}</span>
               </a>
-            ) : (
-              <span />
             )}
             {dalsi && (
               <a href={dalsi.href} rel="next" class="pager__next">
-                <span class="label">Další →</span>
-                {dalsi.cislo} {dalsi.nazev}
+                <span class="mono">Kapitola {Number(dalsi.cislo)} →</span>
+                <span>{dalsi.nazev}</span>
               </a>
             )}
           </nav>

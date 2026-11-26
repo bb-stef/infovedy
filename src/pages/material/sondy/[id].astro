@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import MaterialLayout from '../../../layouts/MaterialLayout.astro';
-import { url } from '../../../lib/site';
+import { rimske, url } from '../../../lib/site';
 
 export const getStaticPaths = (async () => {
   const sondy = (await getCollection('sondy')).sort((a, b) => a.data.poradi - b.data.poradi);
@@ -29,6 +29,7 @@ const { Content } = await render(sonda);
   autori={sonda.data.autori}
   stav={sonda.data.stav}
   nadrazena={{ nazev: 'Sondy', href: url('material/sondy/') }}
+  oznaceni={`sonda ${rimske(sonda.data.poradi)}`}
 >
   <div class="prose"><Content /></div>
 
@@ -36,26 +37,26 @@ const { Content } = await render(sonda);
     {
       predchozi ? (
         <a href={url(`material/sondy/${predchozi.id}/`)} rel="prev">
-          <span class="label">← Předchozí sonda</span>
-          {predchozi.data.title}
+          <span class="mono">← Sonda {rimske(predchozi.data.poradi)}</span>
+          <span>{predchozi.data.title}</span>
         </a>
       ) : (
         <a href={url('material/sondy/')}>
-          <span class="label">← Zpět</span>
-          Přehled sond
+          <span class="mono">← Zpět</span>
+          <span>Přehled sond</span>
         </a>
       )
     }
     {
       dalsi ? (
         <a href={url(`material/sondy/${dalsi.id}/`)} rel="next" class="pager__next">
-          <span class="label">Další sonda →</span>
-          {dalsi.data.title}
+          <span class="mono">Sonda {rimske(dalsi.data.poradi)} →</span>
+          <span>{dalsi.data.title}</span>
         </a>
       ) : (
         <a href={url('material/literatura/')} rel="next" class="pager__next">
-          <span class="label">Další →</span>
-          04 Anotovaná literatura
+          <span class="mono">Kapitola 4 →</span>
+          <span>Anotovaná literatura</span>
         </a>
       )
     }

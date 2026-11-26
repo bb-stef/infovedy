@@ -17,17 +17,27 @@ const { title, popis, oznaceni, autori = [], stav, nadrazena } = Astro.props;
 ---
 
 <BaseLayout title={title} description={popis}>
-  <div class="wrap" style="padding-top: 2.5rem">
+  <div class="wrap" style="padding-top: 3rem">
     <header class="page-head">
-      <p class="meta">
-        {nadrazena && <a href={nadrazena.href}>← {nadrazena.nazev}</a>}
-        {oznaceni && <span>{oznaceni}</span>}
-        {autori.length > 0 && <span>autoři: {autori.join(', ')}</span>}
-        {stav && <StavBadge stav={stav} />}
-        <slot name="meta" />
-      </p>
+      {
+        (nadrazena || oznaceni) && (
+          <p class="label">
+            {nadrazena && <a href={nadrazena.href}>{nadrazena.nazev}</a>}
+            {nadrazena && oznaceni && ' — '}
+            {oznaceni}
+          </p>
+        )
+      }
       <h1>{title}</h1>
       {popis && <p class="lead">{popis}</p>}
+      {
+        (autori.length > 0 || stav) && (
+          <p class="meta">
+            {autori.length > 0 && <span>Připravili: {autori.join(', ')}</span>}
+            {stav && <StavBadge stav={stav} />}
+          </p>
+        )
+      }
     </header>
     <slot />
   </div>

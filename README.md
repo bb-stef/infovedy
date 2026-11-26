@@ -69,6 +69,11 @@ V hlavičce každého souboru (mezi `---`) se vyplňuje:
 - `autori: [Jméno, Jméno]` – z toho se automaticky skládá přehled v kapitole 06,
 - `stav: chybi | koncept | hotovo` – zobrazuje se jako tečka v obsahu a na úvodní stránce.
 
+Stav rozpracovanosti a pracovní poznámky vidí jen tým: při `npm run dev` vždy,
+na zveřejněném webu po otevření adresy s `?stav`
+(<https://bb-stef.github.io/infovedy/?stav>). Volba se pamatuje v prohlížeči;
+vypne se adresou s `?stav=0`.
+
 Citace se píšou jako poznámky pod čarou: v textu `[^klic]`, na konci souboru
 `[^klic]: PŘÍJMENÍ, Jméno. Název…`. Web je automaticky očísluje a vypíše
 v sekci „Zdroje a poznámky“.
